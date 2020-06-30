@@ -23,7 +23,11 @@ class HttpDownloader(path: String) : FileDownloader {
     override fun get(fileName: String, url: String): Pair<String, Boolean> {
         return fileName to try {
             val fullName = folder + fileName
-            if(!File(fullName).exists()) {
+            val targetFile = File(fullName)
+            if(!targetFile.exists()) {
+                if(!targetFile.parentFile.exists()){
+                    targetFile.parentFile.mkdir()
+                }
                 println("Trying to download $url")
                 val inChannel = Channels.newChannel(URL(url).openStream())
                 FileOutputStream(fullName).channel.transferFrom(inChannel, 0, Long.MAX_VALUE)

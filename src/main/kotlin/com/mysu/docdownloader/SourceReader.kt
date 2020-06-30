@@ -1,5 +1,6 @@
 package com.mysu.docdownloader
 
+import org.jsoup.Jsoup
 import java.io.FileReader
 
 interface SourceReader {
@@ -17,4 +18,12 @@ class CSVSourceReader(private val path: String) : SourceReader {
 
     }
 
+}
+
+class HtmlSourceReader(private val url: String, private val urlSelector: String): SourceReader {
+    override fun read(): Sequence<Source> {
+        return getLinksFromHtmlWithSelector(url, listOf("pdf" to urlSelector)){
+                e, _ -> e.text().unAccent().replace(" ", "")
+        }.asSequence()
+    }
 }

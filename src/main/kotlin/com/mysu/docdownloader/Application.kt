@@ -1,15 +1,24 @@
 package com.mysu.docdownloader
 
 fun main(args: Array<String>) {
-    InstanceFactory.buildDocDownloader(args[0]).start()
+    //InstanceFactory.buildSpringerDocDownloader(args[0]).start()
+    InstanceFactory.buildUnalDigialLibraryDocDownloader(args[0], args[1]).start()
 }
 
 
 object InstanceFactory {
-    fun buildDocDownloader(path: String): DocDownloader =
-        DocDownloaderImpl(
+    fun buildSpringerDocDownloader(path: String): DocDownloader {
+        val selectors = listOf("pdf" to ".test-bookpdf-link", "epub" to ".test-bookepub-link")
+        return DocDownloaderImpl(
             CSVSourceReader(path),
-            RemoteHtmlProcessor(),
+            RemoteHtmlProcessorSingleFile(selectors),
             HttpDownloader(path)
         )
+    }
+
+    fun buildUnalDigialLibraryDocDownloader(urlSource: String, urlSelector: String): DocDownloader {
+        val selectors = listOf("pdf" to "strong a")
+        return DocDownloaderImpl(HtmlSourceReader(urlSource, urlSelector),
+            RemoteHtmlProcessorMultipleFile(selectors), HttpDownloader("/Users/edwintriana/limbo/libros"))
+    };
 }
